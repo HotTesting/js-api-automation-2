@@ -1,0 +1,4 @@
+--require ./setup.js
+--slow 2000
+--timeout 5000
+2/test/users.ts
