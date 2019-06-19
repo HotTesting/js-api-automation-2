@@ -1,8 +1,21 @@
 import * as request from "request-promise-native";
-import { CookieJar } from "request";
+import { URL } from "url";
+import { CookieJar, RequestAPI, RequiredUriUrl, Response } from "request";
 
-export class Request {
-    protected client
+// Shortcut for request type
+type RequestClient<T> = RequestAPI<
+    request.RequestPromise<TypifiedResponse<T>>,
+    request.RequestPromiseOptions,
+    RequiredUriUrl
+>;
+
+// Own Response type to support typified bodies
+interface TypifiedResponse<T = any> extends Response {
+    body: T;
+}
+
+export class Request<T = any> {
+    protected client: RequestClient<T>;
     protected options: request.OptionsWithUri;
 
     constructor(absoluteURL: string) {
@@ -17,7 +30,7 @@ export class Request {
             time: true, // For logging purposes
             resolveWithFullResponse: true, // To get full response, not just body
             followAllRedirects: true
-        });
+        }) as RequestClient<T>;
     }
 
     /**
@@ -50,6 +63,7 @@ export class Request {
 
     /**
      * Set a token for Authentication Bearer header
+     * Do not set if token is not passed
      * @param token string
      */
     public auth(token: string) {
@@ -66,7 +80,7 @@ export class Request {
         return this;
     }
 
-    public async send() {
+    public async send(): Promise<TypifiedResponse<T>> {
         // Sending request with collected options, will be merged with default params.
         let response = this.client(this.options);
         this.logResponse(response);
@@ -77,7 +91,9 @@ export class Request {
      * Helper function to print response
      * @param responsePromise
      */
-    private async logResponse(responsePromise) {
+    private async logResponse(
+        responsePromise: request.RequestPromise<TypifiedResponse<T>>
+    ) {
         try {
             let response = await responsePromise;
             console.log(

@@ -3,6 +3,22 @@ import * as faker from "faker";
 import { expect } from "chai";
 
 describe("User", function () {
+    let adminResp 
+
+    // pre-test preconditions
+    beforeEach(async function () {
+        // login as admin
+        adminResp = await new Request(
+            "http://ip-5236.sunline.net.ua:30020/users/login"
+        )
+            .method("POST")
+            .body({
+                email: "test@test.com",
+                password: "123456"
+            })
+            .send();
+    })
+
     it("self register should be successful", async function () {
         // Generating random email
         const email = faker.internet.email(
@@ -11,7 +27,6 @@ describe("User", function () {
             "ip-5236.sunline.net.ua"
         );
 
-        // Register
         const resp = await new Request(
             "http://ip-5236.sunline.net.ua:30020/users/register"
         )
