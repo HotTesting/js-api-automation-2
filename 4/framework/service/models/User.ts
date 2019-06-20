@@ -37,3 +37,30 @@ export interface User {
     authenticationMethod: string;
     isAdmin?: boolean;
 }
+
+
+class UserModel implements User {
+
+}
+
+class UserBuilder {
+    model
+
+    constructor() {
+        this.model = {
+            
+        }
+    }
+
+    setServices(services: Services) {
+        this.model.services = services
+        return this
+    }
+
+    build() {
+        return this.model
+    }
+
+}
+
+let model = new UserBuilder().setServices({}).build()
